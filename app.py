@@ -7,22 +7,18 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-# 1. Page Config (MUST be the first Streamlit command)
 st.set_page_config(
     page_title="MOIL Predictive Intelligence",
     layout="wide",
     page_icon="image.png",
 )
 
-
-# 2. Function to inject local background image
 def set_background(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
             img_data = f.read()
         b64_encoded = base64.b64encode(img_data).decode()
 
-        # Detect extension for proper mime type
         ext = image_path.split(".")[-1].lower()
         mime = "png" if ext == "png" else "jpeg"
 
@@ -50,14 +46,8 @@ def set_background(image_path):
     else:
         st.warning(f"Background image '{image_path}' not found in folder.")
 
-
-# -----------------------------------------------------------------------------
-# CHANGE "image.png" TO YOUR EXACT BACKGROUND IMAGE FILENAME
-# -----------------------------------------------------------------------------
 set_background("background.png")
 
-
-# 3. Model & Data Initialization
 @st.cache_resource
 def init_system():
     ai = MOILManganeseAI()
@@ -67,7 +57,6 @@ def init_system():
 
 ai_engine, res_df, ops_df = init_system()
 
-# 4. Header Section
 col_logo, col_title = st.columns([1, 8])
 with col_title:
     st.title("MOIL AI & Space Tech Command Center")
@@ -78,7 +67,6 @@ with col_title:
 
 st.markdown("---")
 
-# 5. Section 1: Strategic Overview
 st.subheader("1. Strategic Overview (Historical & Market Context)")
 st.markdown(
     "Based on data extracted from the IBM Indian Minerals Yearbook 2024 and"
@@ -115,7 +103,6 @@ render_chart(
 
 st.markdown("---")
 
-# 6. Section 2: Sub-surface Reserve Mapping
 st.subheader("2. Sub-surface Reserve Mapping (AI + Earth Observation)")
 st.markdown("""
 Using simulated Sentinel-2/Bhuvan satellite telemetry (NDVI, LST) fused with geological drill hole depth. 
@@ -162,14 +149,13 @@ with chart_col:
         "Current Proved vs Remaining Resources",
     )
     st.info(
-        "💡 **Insight:** Notice the massive 'Remaining Resources' volume in"
+        "**Insight:** Notice the massive 'Remaining Resources' volume in"
         " Odisha, Karnataka, and Goa. AI-driven mapping allows MOIL to efficiently"
         " convert these into 'Proved Reserves' without excessive manual drilling."
     )
 
 st.markdown("---")
 
-# 7. Section 3: Operational Shortfall Predictor
 st.subheader("3. Real-Time Operational Shortfall Predictor")
 st.markdown(
     "Adjust the daily telemetry sliders below to simulate mine-site conditions"
@@ -223,7 +209,7 @@ with sc2:
 
     if pred_label == 1:
         st.error(
-            "🚨 **SHORTFALL IMMINENT:** AI Model flags a high probability of"
+            "**SHORTFALL IMMINENT:** AI Model flags a high probability of"
             " missing daily production targets."
         )
     else:
