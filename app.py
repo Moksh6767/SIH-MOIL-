@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
-# 1. Page Config (MUST be the first Streamlit command)
 st.set_page_config(
     page_title="MOIL Predictive Intelligence",
     layout="wide",
@@ -441,7 +440,6 @@ def section_header(label, title, sub=None):
             f'<div class="section-sub">{sub}</div>', unsafe_allow_html=True)
 
 
-# 3. Model & Data Initialization
 @st.cache_resource
 def init_system():
     ai = MOILManganeseAI()
