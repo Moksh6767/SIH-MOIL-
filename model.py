@@ -7,6 +7,29 @@ import os
 
 
 class MOILManganeseAI:
+    # Known Indian manganese-ore belts the app's dropdown can switch between.
+    # lat/lon ranges only decide where points scatter on the map — the
+    # trained grade model doesn't use location as a feature, so any belt's
+    # points can be scored with the same model.
+    BELTS = {
+        "Balaghat-Nagpur (MP / Maharashtra)": {
+            "lat_range": (21.4, 21.9), "lon_range": (79.5, 80.5),
+            "center": {"lat": 21.65, "lon": 80.0}, "zoom": 7,
+        },
+        "Keonjhar-Sundargarh (Odisha)": {
+            "lat_range": (21.6, 22.3), "lon_range": (85.2, 85.9),
+            "center": {"lat": 21.95, "lon": 85.55}, "zoom": 7,
+        },
+        "Bellary-Hospet (Karnataka)": {
+            "lat_range": (15.0, 15.4), "lon_range": (76.3, 76.9),
+            "center": {"lat": 15.2, "lon": 76.6}, "zoom": 8,
+        },
+        "North Goa Belt": {
+            "lat_range": (15.35, 15.65), "lon_range": (73.9, 74.2),
+            "center": {"lat": 15.5, "lon": 74.05}, "zoom": 9,
+        },
+    }
+
     def __init__(self, random_state=42):
         self.random_state = random_state
         self.reserve_model = RandomForestRegressor(
@@ -14,6 +37,34 @@ class MOILManganeseAI:
         self.shortfall_model = RandomForestClassifier(
             n_estimators=100, random_state=self.random_state)
         self.is_trained = False
+
+    def generate_belt_data(self, belt_name, n_samples=250):
+        """
+        Generates simulated survey points (lat/lon + satellite/geological
+        features) scattered within the chosen belt's bounding box, ready to
+        be scored by predict_reserve_grid(). Does not include mn_grade_pct —
+        that's the model's job.
+        """
+        cfg = self.BELTS[belt_name]
+        rng = np.random.default_rng(self.random_state)
+
+        lats = rng.uniform(*cfg["lat_range"], n_samples)
+        lons = rng.uniform(*cfg["lon_range"], n_samples)
+        depth = rng.uniform(15.0, 220.0, n_samples)
+        ndvi = rng.uniform(0.12, 0.65, n_samples)
+        lst_c = rng.uniform(28.0, 44.0, n_samples)
+        soil_moisture = rng.uniform(12.0, 48.0, n_samples)
+        magnetic_susceptibility = rng.uniform(10.0, 95.0, n_samples)
+
+        return pd.DataFrame({
+            'latitude': lats,
+            'longitude': lons,
+            'depth_m': depth,
+            'ndvi': ndvi,
+            'lst_celsius': lst_c,
+            'soil_moisture_pct': soil_moisture,
+            'mag_susceptibility': magnetic_susceptibility,
+        })
 
     def generate_space_reserve_data(self, n_samples=600):
         """
